@@ -129,5 +129,24 @@ namespace BestelService.UnitTest
             // Assert
             result.Should().BeEquivalentTo(expectedProducts);
         }
+
+        [TestMethod]
+        public async Task ProductController_Search_FluentAssertionsMetExtensionMethod_ProductsReturned()
+        {
+            // Arrange
+            var request = _fixture.Create<SearchProductsRequest>();
+            var expectedQuery = request.ToQuery();
+            var expectedProducts = _fixture.CreateMany<Product>();
+
+            // AsExpectedObject() should be called within the Setup or it doesn't work
+            _mediatorMock.Setup(m => m.Send(expectedQuery.AsExpectedObject(), default))
+                         .ReturnsAsync(expectedProducts);
+
+            // Act
+            var result = await _sut.Search(request);
+
+            // Assert
+            result.Should().BeEquivalentTo(expectedProducts);
+        }
     }
 }
