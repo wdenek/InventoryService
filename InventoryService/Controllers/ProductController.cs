@@ -26,6 +26,8 @@ namespace InventoryService.Controllers
 
         public async Task<IEnumerable<Product>> SearchBad(SearchProductsRequest request)
         {
+            // I wouldn't do this because the only way to test the mapping
+            // is through the mediator mock.
             var query = new SearchProductsQuery
             {
                 Name = request.Name,
@@ -38,6 +40,8 @@ namespace InventoryService.Controllers
 
         public async Task<IEnumerable<Product>> Search(SearchProductsRequest request)
         {
+            // I'd create an extension method containing the mapping
+            // (wich can be implemented manually, with AutoMapper, etc.)
             var query = request.ToQuery();
             return await mediator.Send(query);
         }

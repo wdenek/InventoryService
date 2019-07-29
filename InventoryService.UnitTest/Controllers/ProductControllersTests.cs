@@ -77,6 +77,9 @@ namespace BestelService.UnitTest
             var request = _fixture.Create<SearchProductsRequest>();
             var expectedProducts = _fixture.CreateMany<Product>();
 
+            // This is your Approach 2 wich I wouldn't use.
+            // Currently it's still sort of readable but with more complex mapping logic this would be horrible.
+            // You would also have to verify all different mapping cases if the mapping is more complex with conditional logic.
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
                     qry => qry.Name == request.Name &&
@@ -102,7 +105,31 @@ namespace BestelService.UnitTest
             var expectedQuery = request.ToQuery();
             var expectedProducts = _fixture.CreateMany<Product>();
 
+            // Something like this would be my preferred approach.
+            // The ToQuery mapping method is unit tested separately and reused in this test.
+            // I've created a helper method to uses FluentAssertions to compare the
+            // expectedObject with the object that is passed into Send.
             _mediatorMock.Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
+                         .ReturnsAsync(expectedProducts);
+
+            // Act
+            var result = await _sut.Search(request);
+
+            // Assert
+            result.Should().BeEquivalentTo(expectedProducts);
+        }
+
+        [TestMethod]
+        public async Task ProductController_Search_FluentAssertionsMetExtensionMethod_ProductsReturned()
+        {
+            // Arrange
+            var request = _fixture.Create<SearchProductsRequest>();
+            var expectedQuery = request.ToQuery();
+            var expectedProducts = _fixture.CreateMany<Product>();
+
+            // Same approach as above but with an extension method.
+            // AsExpectedObject() should be called within the Setup or it doesn't work.
+            _mediatorMock.Setup(m => m.Send(expectedQuery.AsExpectedObject(), default))
                          .ReturnsAsync(expectedProducts);
 
             // Act
@@ -120,30 +147,13 @@ namespace BestelService.UnitTest
             var expectedQuery = _fixture.Create<SearchProductsQuery>();
             var expectedProducts = _fixture.CreateMany<Product>();
 
+            // Example that shows how a failure looks liek.
+            // See the Output of the test for the details on why the comparison failed.
             _mediatorMock.Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
                          .ReturnsAsync(expectedProducts);
 
             // Act
             var result = await _sut.Search(invalidRequest);
-
-            // Assert
-            result.Should().BeEquivalentTo(expectedProducts);
-        }
-
-        [TestMethod]
-        public async Task ProductController_Search_FluentAssertionsMetExtensionMethod_ProductsReturned()
-        {
-            // Arrange
-            var request = _fixture.Create<SearchProductsRequest>();
-            var expectedQuery = request.ToQuery();
-            var expectedProducts = _fixture.CreateMany<Product>();
-
-            // AsExpectedObject() should be called within the Setup or it doesn't work
-            _mediatorMock.Setup(m => m.Send(expectedQuery.AsExpectedObject(), default))
-                         .ReturnsAsync(expectedProducts);
-
-            // Act
-            var result = await _sut.Search(request);
 
             // Assert
             result.Should().BeEquivalentTo(expectedProducts);

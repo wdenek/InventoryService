@@ -10,6 +10,7 @@ namespace InventoryService.Mappers
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
+            // In this case it could also be mapped using AutoMapper
             return new SearchProductsQuery
             {
                 Name = request.Name,
