@@ -83,7 +83,7 @@ namespace BestelService.UnitTest
                         qry.Description == request.Description &&
                         qry.Category == request.Category &&
                         qry.IsInStock == request.IsInStock),
-                    It.IsAny<CancellationToken>())
+                    default)
                 )
                 .ReturnsAsync(expectedProducts);
 
@@ -105,7 +105,7 @@ namespace BestelService.UnitTest
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
                     qry => Its.EquivalentTo(qry, expectedQuery)),
-                    It.IsAny<CancellationToken>())
+                    default)
                 )
                 .ReturnsAsync(expectedProducts);
 
@@ -130,7 +130,7 @@ namespace BestelService.UnitTest
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
                     qry => Its.EquivalentTo(qry, expectedQuery)),
-                    It.IsAny<CancellationToken>())
+                    default)
                 )
                 .ReturnsAsync(expectedProducts);
 
