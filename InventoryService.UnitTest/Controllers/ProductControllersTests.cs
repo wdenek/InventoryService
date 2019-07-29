@@ -8,7 +8,6 @@ using InventoryService.UnitTest.TestTools;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using SemanticComparison.Fluent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -130,27 +129,6 @@ namespace BestelService.UnitTest
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
                     qry => Its.EquivalentTo(qry, expectedQuery)), default)
-                )
-                .ReturnsAsync(expectedProducts);
-
-            // Act
-            var result = await _sut.Search(request);
-
-            // Assert
-            result.Should().BeEquivalentTo(expectedProducts);
-        }
-
-        [TestMethod]
-        public async Task ProductController_Search_SemanticComparison_ProductsReturned()
-        {
-            // Arrange
-            var request = _fixture.Create<SearchProductsRequest>();
-            var expectedQuery = request.ToQuery().AsSource().OfLikeness<SearchProductsQuery>();
-            var expectedProducts = _fixture.CreateMany<Product>();
-
-            _mediatorMock
-                .Setup(m => m.Send(It.Is<SearchProductsQuery>(
-                    qry => expectedQuery.Equals(qry)), default)
                 )
                 .ReturnsAsync(expectedProducts);
 
