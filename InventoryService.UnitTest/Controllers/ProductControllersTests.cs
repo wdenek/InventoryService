@@ -1,6 +1,7 @@
 using AutoFixture;
 using InventoryService.Controllers;
 using InventoryService.Models;
+using InventoryService.Mappers;
 using InventoryService.Queries;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using InventoryService.UnitTest.TestTools;
 
 namespace BestelService.UnitTest
 {
@@ -77,10 +79,10 @@ namespace BestelService.UnitTest
 
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
-                    req => req.Name == request.Name &&
-                        req.Description == request.Description &&
-                        req.Category == request.Category &&
-                        req.IsInStock == request.IsInStock),
+                    qry => qry.Name == request.Name &&
+                        qry.Description == request.Description &&
+                        qry.Category == request.Category &&
+                        qry.IsInStock == request.IsInStock),
                     It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(expectedProducts);
@@ -97,14 +99,37 @@ namespace BestelService.UnitTest
         {
             // Arrange
             var request = _fixture.Create<SearchProductsRequest>();
+            var expectedQuery = request.ToQuery();
             var expectedProducts = _fixture.CreateMany<Product>();
 
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
-                    req => req.Name == request.Name &&
-                        req.Description == request.Description &&
-                        req.Category == request.Category &&
-                        req.IsInStock == request.IsInStock),
+                    qry => Its.EquivalentTo(qry, expectedQuery)),
+                    It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(expectedProducts);
+
+            // Act
+            var result = await _sut.Search(request);
+
+            // Assert
+            result.Should().BeEquivalentTo(expectedProducts);
+        }
+
+        [TestMethod]
+        public async Task ProductController_Search_WrongQuery_ShouldFail()
+        {
+            // Arrange
+            var request = _fixture.Create<SearchProductsRequest>();
+
+            var expectedQuery = request.ToQuery();
+            expectedQuery.Name = "Wrong";
+
+            var expectedProducts = _fixture.CreateMany<Product>();
+
+            _mediatorMock
+                .Setup(m => m.Send(It.Is<SearchProductsQuery>(
+                    qry => Its.EquivalentTo(qry, expectedQuery)),
                     It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(expectedProducts);
