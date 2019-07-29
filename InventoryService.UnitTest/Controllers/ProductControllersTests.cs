@@ -30,7 +30,7 @@ namespace BestelService.UnitTest
         }
 
         [TestMethod]
-        public void ProductController_Get_ReturnsCorrectProducts()
+        public async Task ProductController_Get_ReturnsCorrectProducts()
         {
             // Arrange
             var expectedProducts = _fixture.CreateMany<Product>();
@@ -39,7 +39,7 @@ namespace BestelService.UnitTest
                         .ReturnsAsync(expectedProducts);
 
             // Act
-            var resultBroden = _sut.Get().Result;
+            var resultBroden = await _sut.Get();
 
             // Assert
             Assert.IsNotNull(resultBroden);
@@ -48,7 +48,7 @@ namespace BestelService.UnitTest
         }
 
         [TestMethod]
-        public void ProductController_GetById_ReturnsCorrectItem()
+        public async Task ProductController_GetById_ReturnsCorrectItem()
         {
             int expectedProductId = 12;
 
@@ -63,7 +63,7 @@ namespace BestelService.UnitTest
                         .ReturnsAsync(new Product(expectedProductId, "Wit"));
             
             // Act
-            var result = _sut.Get(expectedProductId).Result;
+            var result = await _sut.Get(expectedProductId);
 
             // Assert
             Assert.IsNotNull(result);
@@ -102,9 +102,8 @@ namespace BestelService.UnitTest
             var expectedQuery = request.ToQuery();
             var expectedProducts = _fixture.CreateMany<Product>();
 
-            _mediatorMock
-                .Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
-                .ReturnsAsync(expectedProducts);
+            _mediatorMock.Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
+                         .ReturnsAsync(expectedProducts);
 
             // Act
             var result = await _sut.Search(request);
@@ -121,9 +120,8 @@ namespace BestelService.UnitTest
             var expectedQuery = _fixture.Create<SearchProductsQuery>();
             var expectedProducts = _fixture.CreateMany<Product>();
 
-            _mediatorMock
-                .Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
-                .ReturnsAsync(expectedProducts);
+            _mediatorMock.Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
+                         .ReturnsAsync(expectedProducts);
 
             // Act
             var result = await _sut.Search(invalidRequest);
