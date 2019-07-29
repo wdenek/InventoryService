@@ -1,4 +1,5 @@
-﻿using InventoryService.Models;
+﻿using InventoryService.Mappers;
+using InventoryService.Models;
 using InventoryService.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,8 @@ namespace InventoryService.Controllers
 
         public async Task<IEnumerable<Product>> Search(SearchProductsRequest request)
         {
-            throw new System.NotImplementedException();
+            var query = request.ToQuery();
+            return await mediator.Send(query);
         }
     }   
 }

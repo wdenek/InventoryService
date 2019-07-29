@@ -91,5 +91,29 @@ namespace BestelService.UnitTest
             // Assert
             result.Should().BeEquivalentTo(expectedProducts);
         }
+
+        [TestMethod]
+        public async Task ProductController_Search_ProductsReturned()
+        {
+            // Arrange
+            var request = _fixture.Create<SearchProductsRequest>();
+            var expectedProducts = _fixture.CreateMany<Product>();
+
+            _mediatorMock
+                .Setup(m => m.Send(It.Is<SearchProductsQuery>(
+                    req => req.Name == request.Name &&
+                        req.Description == request.Description &&
+                        req.Category == request.Category &&
+                        req.IsInStock == request.IsInStock),
+                    It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(expectedProducts);
+
+            // Act
+            var result = await _sut.Search(request);
+
+            // Assert
+            result.Should().BeEquivalentTo(expectedProducts);
+        }
     }
 }
