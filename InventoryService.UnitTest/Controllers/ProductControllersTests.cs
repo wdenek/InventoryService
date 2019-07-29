@@ -7,6 +7,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace BestelService.UnitTest
 {
@@ -14,27 +16,28 @@ namespace BestelService.UnitTest
     public class ProductControllerTests
     {
         private Fixture _fixture;
+        private Mock<IMediator> _mediatorMock;
+        private ProductController _sut;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _fixture = new Fixture();
+            _mediatorMock = new Mock<IMediator>();
+            _sut = new ProductController(_mediatorMock.Object);
         }
 
         [TestMethod]
         public void ProductController_Get_ReturnsCorrectProducts()
         {
             // Arrange
-            var mediatorMock = new Mock<IMediator>();
             var expectedProducts = _fixture.CreateMany<Product>();
 
-            mediatorMock.Setup(m => m.Send(It.IsAny<GetProductsQuery>(), It.IsAny<CancellationToken>()))
+            _mediatorMock.Setup(m => m.Send(It.IsAny<GetProductsQuery>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(expectedProducts);
 
-            var sut = new ProductController(mediatorMock.Object);
-
             // Act
-            var resultBroden = sut.Get().Result;
+            var resultBroden = _sut.Get().Result;
 
             // Assert
             Assert.IsNotNull(resultBroden);
@@ -48,24 +51,45 @@ namespace BestelService.UnitTest
             int expectedProductId = 12;
 
             // Arrange
-            var mediatorMock = new Mock<IMediator>();
-
+            
             // Approach 1: make use of GetHashCode and Equals function in the GetProductQuery
-            mediatorMock.Setup(m => m.Send(new GetProductQuery(expectedProductId), It.IsAny<CancellationToken>()))
+            _mediatorMock.Setup(m => m.Send(new GetProductQuery(expectedProductId), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(new Product(expectedProductId, "Wit"));
 
             // Approach 2: make use of It.Is<GetProductQuery>
-            mediatorMock.Setup(m => m.Send(It.Is<GetProductQuery>(q => q.Id == expectedProductId), It.IsAny<CancellationToken>()))
+            _mediatorMock.Setup(m => m.Send(It.Is<GetProductQuery>(q => q.Id == expectedProductId), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(new Product(expectedProductId, "Wit"));
             
-            var sut = new ProductController(mediatorMock.Object);
-
             // Act
-            var result = sut.Get(expectedProductId).Result;
+            var result = _sut.Get(expectedProductId).Result;
 
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(expectedProductId, result.Id);
+        }
+
+        [TestMethod]
+        public async Task ProductController_SearchBad_ProductsReturned()
+        {
+            // Arrange
+            var request = _fixture.Create<SearchProductsRequest>();
+            var expectedProducts = _fixture.CreateMany<Product>();
+
+            _mediatorMock
+                .Setup(m => m.Send(It.Is<SearchProductsQuery>(
+                    req => req.Name == request.Name &&
+                        req.Description == request.Description &&
+                        req.Category == request.Category &&
+                        req.IsInStock == request.IsInStock),
+                    It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(expectedProducts);
+
+            // Act
+            var result = await _sut.SearchBad(request);
+
+            // Assert
+            result.Should().BeEquivalentTo(expectedProducts);
         }
     }
 }

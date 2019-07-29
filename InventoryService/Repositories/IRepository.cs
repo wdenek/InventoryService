@@ -1,4 +1,5 @@
 ﻿using InventoryService.Models;
+using InventoryService.Queries;
 using System.Collections.Generic;
 
 namespace InventoryService.Repositories
@@ -8,5 +9,7 @@ namespace InventoryService.Repositories
         IEnumerable<Product> Get();
 
         Product Get(int id);
+
+        IEnumerable<Product> Search(SearchProductsQuery searchQuery);
     }
 }

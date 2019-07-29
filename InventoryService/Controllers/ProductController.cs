@@ -23,5 +23,21 @@ namespace InventoryService.Controllers
         public async Task<Product> Get(int id) =>
             await mediator.Send(new GetProductQuery(id));
 
+        public async Task<IEnumerable<Product>> SearchBad(SearchProductsRequest request)
+        {
+            var query = new SearchProductsQuery
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Category = request.Category,
+                IsInStock = request.IsInStock
+            };
+            return await mediator.Send(query);
+        }
+
+        public async Task<IEnumerable<Product>> Search(SearchProductsRequest request)
+        {
+            throw new System.NotImplementedException();
+        }
     }   
 }

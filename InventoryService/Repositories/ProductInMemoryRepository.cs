@@ -1,4 +1,5 @@
 ﻿using InventoryService.Models;
+using InventoryService.Queries;
 using InventoryService.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,11 @@ namespace BestelService.Repositories
         public Product Get(int id)
         {
             return products.FirstOrDefault(b => b.Id == id);
+        }
+
+        public IEnumerable<Product> Search(SearchProductsQuery searchQuery)
+        {
+            return products.Where(p => p.Name.Contains(searchQuery.Name));
         }
     }
 }
