@@ -1,12 +1,14 @@
 ﻿using FluentAssertions;
-using FluentAssertions.Equivalency;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
 using System.Diagnostics;
 
 namespace InventoryService.UnitTest.TestTools
 {
+    /// <summary>
+    /// Contains helper methods that combine fuctionality of Moq and FluentAssertions
+    /// to make it easier to work with expected input parameters in mocks.
+    /// </summary>
     static class Its
     {
         /// <summary>
@@ -49,6 +51,10 @@ namespace InventoryService.UnitTest.TestTools
             }
             catch (AssertFailedException ex)
             {
+                // Although catching an Exception to return false is a bit ugly
+                // the great advantage is that we can log the error message of FluentAssertions.
+                // This makes it easier to troubleshoot why a Mock was not called with the expected parameters.
+
                 Trace.WriteLine($"Actual and expected of type {typeof(T)} are not equal. Details:");
                 Trace.WriteLine(ex.ToString());
                 return false;
