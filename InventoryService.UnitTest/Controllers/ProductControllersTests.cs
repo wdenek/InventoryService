@@ -103,9 +103,7 @@ namespace BestelService.UnitTest
             var expectedProducts = _fixture.CreateMany<Product>();
 
             _mediatorMock
-                .Setup(m => m.Send(It.Is<SearchProductsQuery>(
-                    qry => Its.EquivalentTo(qry, expectedQuery)), default)
-                )
+                .Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
                 .ReturnsAsync(expectedProducts);
 
             // Act
@@ -116,24 +114,19 @@ namespace BestelService.UnitTest
         }
 
         [TestMethod]
-        public async Task ProductController_Search_FluentAssertions_WrongQuery_ShouldFail()
+        public async Task ProductController_Search_FluentAssertions_InvalidRequest_ShouldFail()
         {
             // Arrange
-            var request = _fixture.Create<SearchProductsRequest>();
-
-            var expectedQuery = request.ToQuery();
-            expectedQuery.Name = "Wrong";
-
+            var invalidRequest = _fixture.Create<SearchProductsRequest>();
+            var expectedQuery = _fixture.Create<SearchProductsQuery>();
             var expectedProducts = _fixture.CreateMany<Product>();
 
             _mediatorMock
-                .Setup(m => m.Send(It.Is<SearchProductsQuery>(
-                    qry => Its.EquivalentTo(qry, expectedQuery)), default)
-                )
+                .Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
                 .ReturnsAsync(expectedProducts);
 
             // Act
-            var result = await _sut.Search(request);
+            var result = await _sut.Search(invalidRequest);
 
             // Assert
             result.Should().BeEquivalentTo(expectedProducts);
