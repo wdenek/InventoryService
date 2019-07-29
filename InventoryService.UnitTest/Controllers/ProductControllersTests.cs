@@ -104,8 +104,7 @@ namespace BestelService.UnitTest
 
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
-                    qry => Its.EquivalentTo(qry, expectedQuery)),
-                    default)
+                    qry => Its.EquivalentTo(qry, expectedQuery)), default)
                 )
                 .ReturnsAsync(expectedProducts);
 
@@ -129,8 +128,7 @@ namespace BestelService.UnitTest
 
             _mediatorMock
                 .Setup(m => m.Send(It.Is<SearchProductsQuery>(
-                    qry => Its.EquivalentTo(qry, expectedQuery)),
-                    default)
+                    qry => Its.EquivalentTo(qry, expectedQuery)), default)
                 )
                 .ReturnsAsync(expectedProducts);
 
