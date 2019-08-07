@@ -66,6 +66,7 @@ namespace InventoryService.UnitTest.TestTools
         {
             return Match.Create(
                 actual => AreEquivalent(actual, expected, config),
+                //this second parameter is used in error messages to display what the expression is
                 () => Its.EquivalentTo<TValue>(expected)
             );
         }
