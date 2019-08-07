@@ -7,19 +7,16 @@ namespace InventoryService.UnitTest.TestTools
 {
     /// <summary>
     /// Contains helper methods that combine fuctionality of Moq and FluentAssertions
-    /// to make it easier to work with expected input parameters in mocks.
+    /// to make it easier to work with complex input parameters in mocks.
     /// </summary>
     static class Its
     {
         /// <summary>
-        /// Will create a <see cref="Mock"/> of <typeparamref name="T"/> where the Equals is overriden by a call to <see cref="AreEquivalent{T}(T, T)"/>.
-        /// This will compare <paramref name="expected"/> with any passed object using <see cref="FluentAssertions"/>.
+        /// Matches any value that is equivalent to <paramref name="expected"/>.
         /// </summary>
-        /// <typeparam name="T">T of the expected object.</typeparam>
-        /// <param name="expected">The expected object to use for comparison.</param>
-        /// <returns><see cref="Mock"/> of <typeparamref name="T"/></returns>
-        public static T AsExpectedObject<T>(this T expected)
-            where T : class
+        /// <typeparam name="TValue">Type of the argument to check.</typeparam>
+        /// <param name="expected">The expected object to match.</param>
+        public static TValue AsExpectedObject<TValue>(this TValue expected)
         {
             return Its.EquivalentTo(expected);
         }
@@ -30,7 +27,6 @@ namespace InventoryService.UnitTest.TestTools
         /// <typeparam name="TValue">Type of the argument to check.</typeparam>
         /// <param name="expected">The expected object to match.</param>
         public static TValue EquivalentTo<TValue>(TValue expected)
-            where TValue : class
         {
             return Match<TValue>.Create(
                 actual => AreEquivalent(actual, expected),
@@ -38,7 +34,7 @@ namespace InventoryService.UnitTest.TestTools
             );
         }
 
-        private static bool AreEquivalent<T>(T actual, T expected)
+        private static bool AreEquivalent<TValue>(TValue actual, TValue expected)
         {
             try
             {
@@ -51,7 +47,7 @@ namespace InventoryService.UnitTest.TestTools
                 // the great advantage is that we can log the error message of FluentAssertions.
                 // This makes it easier to troubleshoot why a Mock was not called with the expected parameters.
 
-                Trace.WriteLine($"Actual and expected of type {typeof(T)} are not equal. Details:");
+                Trace.WriteLine($"Actual and expected of type {typeof(TValue)} are not equal. Details:");
                 Trace.WriteLine(ex.ToString());
                 return false;
             }
