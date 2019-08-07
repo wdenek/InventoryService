@@ -158,5 +158,28 @@ namespace BestelService.UnitTest
             // Assert
             result.Should().BeEmpty(); //empty because command doesn't match request in setup
         }
+
+        [TestMethod]
+        public async Task ProductController_Search_FluentAssertions_DifferenceBetweenCommandAndRequestButPropertyIsIgnored_ProductsReturned()
+        {
+            // Arrange
+            var request = _fixture.Create<SearchProductsRequest>();
+            var expectedQuery = request.ToQuery();
+            expectedQuery.Description = "Different value as request";
+            var expectedProducts = _fixture.CreateMany<Product>();
+
+            _mediatorMock
+                .Setup(m => m.Send(
+                    Its.EquivalentTo(expectedQuery, options => options.Excluding(qry => qry.Description)),
+                    default)
+                )
+                .ReturnsAsync(expectedProducts);
+
+            // Act
+            var result = await _sut.Search(request);
+
+            // Assert
+            result.Should().BeEquivalentTo(expectedProducts);
+        }
     }
 }
