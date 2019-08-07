@@ -25,21 +25,17 @@ namespace InventoryService.UnitTest.TestTools
         }
         
         /// <summary>
-        /// Will create a <see cref="Mock"/> of <typeparamref name="T"/> where the Equals is overriden by a call to <see cref="AreEquivalent{T}(T, T)"/>.
-        /// This will compare <paramref name="expected"/> with any passed object using <see cref="FluentAssertions"/>.
+        /// Matches any value that is equivalent to <paramref name="expected"/>.
         /// </summary>
-        /// <typeparam name="T">T of the expected object.</typeparam>
-        /// <param name="expected">The expected object to use for comparison.</param>
-        /// <returns><see cref="Mock"/> of <typeparamref name="T"/></returns>
-        public static T EquivalentTo<T>(T expected)
-            where T : class
+        /// <typeparam name="TValue">Type of the argument to check.</typeparam>
+        /// <param name="expected">The expected object to match.</param>
+        public static TValue EquivalentTo<TValue>(TValue expected)
+            where TValue : class
         {
-            var mockOfExpected = new Mock<T>();
-
-            mockOfExpected.Setup(m => m.Equals(It.IsAny<object>()))
-                .Returns((object obj) => AreEquivalent(obj, expected));
-
-            return mockOfExpected.Object;
+            return Match<TValue>.Create(
+                actual => AreEquivalent(actual, expected),
+                () => Its.EquivalentTo<TValue>(expected)
+            );
         }
 
         private static bool AreEquivalent<T>(T actual, T expected)
