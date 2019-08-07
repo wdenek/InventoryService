@@ -31,7 +31,7 @@ namespace InventoryService.UnitTest.TestTools
         public static TValue EquivalentTo<TValue>(TValue expected)
         {
             return Match.Create(
-                actual => AreEquivalent(actual, expected),
+                actual => AreEquivalent(actual, expected, options => options),
                 () => Its.EquivalentTo<TValue>(expected)
             );
         }
@@ -48,25 +48,6 @@ namespace InventoryService.UnitTest.TestTools
                 actual => AreEquivalent(actual, expected, config),
                 () => Its.EquivalentTo<TValue>(expected)
             );
-        }
-
-        private static bool AreEquivalent<TValue>(TValue actual, TValue expected)
-        {
-            try
-            {
-                actual.Should().BeEquivalentTo(expected);
-                return true;
-            }
-            catch (AssertFailedException ex)
-            {
-                // Although catching an Exception to return false is a bit ugly
-                // the great advantage is that we can log the error message of FluentAssertions.
-                // This makes it easier to troubleshoot why a Mock was not called with the expected parameters.
-
-                Trace.WriteLine($"Actual and expected of type {typeof(TValue)} are not equal. Details:");
-                Trace.WriteLine(ex.ToString());
-                return false;
-            }
         }
 
         private static bool AreEquivalent<TValue>(TValue actual, TValue expected,
