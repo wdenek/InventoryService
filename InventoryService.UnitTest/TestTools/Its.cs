@@ -30,10 +30,7 @@ namespace InventoryService.UnitTest.TestTools
         /// <param name="expected">The expected object to match.</param>
         public static TValue EquivalentTo<TValue>(TValue expected)
         {
-            return Match.Create(
-                actual => AreEquivalent(actual, expected, options => options),
-                () => Its.EquivalentTo<TValue>(expected)
-            );
+            return EquivalentTo(expected, config => config);
         }
 
         /// <summary>
@@ -41,6 +38,12 @@ namespace InventoryService.UnitTest.TestTools
         /// </summary>
         /// <typeparam name="TValue">Type of the argument to check.</typeparam>
         /// <param name="expected">The expected object to match.</param>
+        /// <param name="config">
+        /// A reference to the <seealso cref="FluentAssertions.Equivalency.EquivalencyAssertionOptions`1"/>
+        /// configuration object that can be used to influence the way the object graphs
+        /// are compared. You can also provide an alternative instance of the <seealso cref="FluentAssertions.Equivalency.EquivalencyAssertionOptions`1"/> class.
+        /// The global defaults are determined by the <seealso cref="FluentAssertions.AssertionOptions"/> class.
+        /// </param>
         public static TValue EquivalentTo<TValue>(TValue expected,
             Func<EquivalencyAssertionOptions<TValue>, EquivalencyAssertionOptions<TValue>> config)
         {
