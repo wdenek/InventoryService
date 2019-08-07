@@ -140,7 +140,7 @@ namespace BestelService.UnitTest
         }
 
         [TestMethod]
-        public async Task ProductController_Search_FluentAssertions_InvalidRequest_ShouldFail()
+        public async Task ProductController_Search_FluentAssertions_InvalidRequest_DoesNotReturnProducts()
         {
             // Arrange
             var invalidRequest = _fixture.Create<SearchProductsRequest>();
@@ -156,7 +156,7 @@ namespace BestelService.UnitTest
             var result = await _sut.Search(invalidRequest);
 
             // Assert
-            result.Should().BeEquivalentTo(expectedProducts);
+            result.Should().BeEmpty(); //empty because command doesn't match request in setup
         }
     }
 }
