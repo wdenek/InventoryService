@@ -1,10 +1,10 @@
 using AutoFixture;
 using FluentAssertions;
+using FluentAssertions.ArgumentMatchers.Moq;
 using InventoryService.Controllers;
 using InventoryService.Mappers;
 using InventoryService.Models;
 using InventoryService.Queries;
-using InventoryService.UnitTest.TestTools;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -110,26 +110,6 @@ namespace BestelService.UnitTest
             // I've created a helper method to uses FluentAssertions to compare the
             // expectedObject with the object that is passed into Send.
             _mediatorMock.Setup(m => m.Send(Its.EquivalentTo(expectedQuery), default))
-                         .ReturnsAsync(expectedProducts);
-
-            // Act
-            var result = await _sut.Search(request);
-
-            // Assert
-            result.Should().BeEquivalentTo(expectedProducts);
-        }
-
-        [TestMethod]
-        public async Task ProductController_Search_FluentAssertionsMetExtensionMethod_ProductsReturned()
-        {
-            // Arrange
-            var request = _fixture.Create<SearchProductsRequest>();
-            var expectedQuery = request.ToQuery();
-            var expectedProducts = _fixture.CreateMany<Product>();
-
-            // Same approach as above but with an extension method.
-            // AsExpectedObject() should be called within the Setup or it doesn't work.
-            _mediatorMock.Setup(m => m.Send(expectedQuery.AsExpectedObject(), default))
                          .ReturnsAsync(expectedProducts);
 
             // Act
